@@ -1,0 +1,60 @@
+import pyttsx3
+import speech_recognition as sr
+import time
+from random import choice
+
+# Initialize TTS engine
+engine = pyttsx3.init()
+
+
+def speak(message):
+    engine.say(message)
+    engine.runAndWait()
+
+
+def listen():
+    recognizer = sr.Recognizer()
+    with sr.Microphone() as source:
+        audio = recognizer.listen(source)
+        try:
+            command = recognizer.recognize_google(audio).lower()
+            return command
+        except sr.UnknownValueError:
+            speak("Sorry, I did not understand that.")
+            return None
+        except sr.RequestError:
+            speak("Sorry, there was an error with the speech recognition service.")
+            return None
+
+
+def detect_obstacle():
+    return choice([True, False])
+
+
+def start_navigation():
+    speak("Welcome, Sarah. Press Start Navigation to begin.")
+    if listen() == "start navigation":
+        speak("Starting navigation. Please proceed straight.")
+        while True:
+            if detect_obstacle():
+                speak("Crosswalk ahead in 10 feet. It's safe to cross.")
+            else:
+                speak("Car approaching from the left, wait.")
+                time.sleep(5)
+                speak("Clear to proceed.")
+
+            command = listen()
+            if command == "stop navigation":
+                speak("Navigation ended. Have a great day, Sarah.")
+                break
+            elif command == "emergency":
+                location = "Lat: 40.7128, Lon: -74.0060"
+                message = f"Sarah needs assistance. Location: {location}"
+                speak(f"Emergency alert sent: {message}")
+                # Implement SMS or email sending logic here
+            else:
+                speak("Unknown command. Please try again.")
+
+
+if __name__ == "__main__":
+    start_navigation()
